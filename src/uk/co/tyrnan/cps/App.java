@@ -1,8 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -14,7 +13,7 @@ public class App extends JPanel implements Runnable {
   private int clickCount = 0;
 
   public App() {
-    this.setLayout(new BorderLayout(5,5));
+    this.setLayout(new BorderLayout(5, 5));
 
     // Top label
     this.add(new JLabel("Click the box below to measure your CPS"), BorderLayout.NORTH);
@@ -32,15 +31,25 @@ public class App extends JPanel implements Runnable {
 
         clickCount++;
       }
+
+      @Override
+      public void mouseEntered(MouseEvent mouseEvent) {
+        start();
+      }
+
+      @Override
+      public void mouseExited(MouseEvent mouseEvent) {
+        stop();
+      }
+
       // We need these to fulfill the contract of the mouse listener interface
       @Override
-      public void mousePressed(MouseEvent mouseEvent) {}
+      public void mousePressed(MouseEvent mouseEvent) {
+      }
+
       @Override
-      public void mouseReleased(MouseEvent mouseEvent) {}
-      @Override
-      public void mouseEntered(MouseEvent mouseEvent) { }
-      @Override
-      public void mouseExited(MouseEvent mouseEvent) {}
+      public void mouseReleased(MouseEvent mouseEvent) {
+      }
     });
     this.add(target, BorderLayout.CENTER);
 
@@ -49,7 +58,7 @@ public class App extends JPanel implements Runnable {
     bottom.add(new JLabel("Current CPS"));
     results = new JLabel("0");
     bottom.add(results);
-    JButton reset =new JButton("Reset");
+    JButton reset = new JButton("Reset");
     bottom.add(reset);
     this.add(bottom, BorderLayout.SOUTH);
 
@@ -65,12 +74,11 @@ public class App extends JPanel implements Runnable {
   }
 
   public void run() {
-    while (this.thread != null ) {
+    while (this.thread != null) {
       try {
-        System.out.println("================\n" + this.startTime + ", " + this.clickCount);
         if (this.startTime != -1 && this.clickCount != 0) {
           long offsetSeconds = (System.currentTimeMillis() - this.startTime) / 1000;
-          float cps = ((float)this.clickCount / offsetSeconds);
+          float cps = ((float) this.clickCount / offsetSeconds);
           this.results.setText(String.format("Time: %ds Clicks: %d, CPS: %f", offsetSeconds, this.clickCount, cps));
         }
         thread.sleep(1000l);
@@ -85,13 +93,14 @@ public class App extends JPanel implements Runnable {
     this.thread = null;
   }
 
-  public static void main(String [] args) {
+  public static void main(String[] args) {
     JFrame jFrame = new JFrame("CPS Calculator");
     App app = new App();
+    app.setBorder(new EmptyBorder(20, 20, 20, 20));
     jFrame.add(app);
     jFrame.setSize(800, 600);
     jFrame.setLocationRelativeTo(null);
-		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     jFrame.setVisible(true);
     app.start();
   }
